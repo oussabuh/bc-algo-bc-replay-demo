@@ -19,3 +19,4 @@ rad.json
 .snapshots/
 cache_*
 ~$*
+bc-algo-bc-replay-demo.code-workspace
