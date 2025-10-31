@@ -1,0 +1,154 @@
+name: post-sales-invoice
+description: Test recording
+telemetryId: 0032a5c6-19b0-491f-9aab-1f2e88e04363
+start:
+  profile: BUSINESS MANAGER EVALUATION
+steps:
+  - type: navigate
+    target:
+      - page: Sales Invoice List
+    description: Navigate to Sales Invoices
+  - type: page-shown
+    source:
+      page: Sales Invoice List
+    modal: false
+    runtimeId: by9
+    description: Page <caption>Sales Invoices</caption> was shown.
+  - type: invoke
+    target:
+      - page: Sales Invoice List
+        runtimeRef: by9
+      - action: Control_New
+    invokeType: New
+    description: Invoke New on <caption>New</caption>
+  - type: page-shown
+    source:
+      page: Sales Invoice
+    modal: false
+    runtimeId: b16i
+    description: Page <caption>New - Sales Invoice</caption> was shown.
+  - type: focus
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - field: Sell-to Customer Name
+    description: Focus <caption>Customer Name</caption>
+  - type: invoke
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - field: Sell-to Customer Name
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Customer Name</caption>
+  - type: page-shown
+    source:
+      page: lookup:Sell-to Customer Name
+    modal: false
+    runtimeId: b1n4
+    description: Page <caption>Select</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Sell-to Customer Name
+        runtimeRef: b1n4
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Sell-to Customer Name
+    runtimeId: b1n4
+    description: Page <caption>Select</caption> was closed.
+  - type: input
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - part: SalesLines
+      - page: Sales Invoice Subform
+      - repeater: Control1
+      - field: No.
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>No.</caption>
+  - type: focus
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - part: SalesLines
+      - page: Sales Invoice Subform
+      - repeater: Control1
+      - field: No.
+    description: Focus <caption>No.</caption>
+  - type: page-shown
+    source:
+      page: lookup:No.
+    modal: false
+    runtimeId: b1pn
+    description: Page <caption>Select</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:No.
+        runtimeRef: b1pn
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:No.
+    runtimeId: b1pn
+    description: Page <caption>Select</caption> was closed.
+  - type: input
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - part: SalesLines
+      - page: Sales Invoice Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Quantity</caption>
+  - type: focus
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - field: null
+        automationId: fb8cccf3-54ac-4d77-9ad8-136cec25583a
+        caption: null
+    description: Focus <caption>null</caption>
+  - type: invoke
+    target:
+      - page: Sales Invoice
+        runtimeRef: b16i
+      - action: Post
+    parameters: {}
+    description: Invoke <caption>Post</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Confirm
+    modal: true
+    runtimeId: b1qj
+    description: Page <caption>Confirm</caption> was shown.
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Confirm
+        runtimeRef: b1qj
+    invokeType: Yes
+    description: Invoke Yes on <caption>Confirm</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: b1qj
+    description: Page <caption>Confirm</caption> was closed.
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Confirm
+    modal: true
+    runtimeId: b1qp
+    description: Page <caption>Confirm</caption> was shown.

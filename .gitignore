@@ -20,3 +20,6 @@ rad.json
 cache_*
 ~$*
 bc-algo-bc-replay-demo.code-workspace
+node_modules/*
+package-lock.json
+package.json
