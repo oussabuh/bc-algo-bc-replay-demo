@@ -1,28 +1,39 @@
 name: Run page scripts (post AL-Go CI)
 
 on:
+  # Auto-trigger right after your main AL-Go workflow completes.
+  # Add both common names to avoid mismatches between repos.
   workflow_run:
     workflows: ["CI/CD"]            # must match your AL-Go main workflow name
     types: [completed]
 
+  # Allow manual runs from the Actions tab (handy for testing)
+  workflow_dispatch:
+
 jobs:
   replay-ui:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # For workflow_run: only run if CI/CD concluded successfully.
+    # For manual runs (workflow_dispatch): always run.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # Install the official replayer from Microsoft (npm)
-      - name: Install bc-replay
+      - name: Install bc-replay (Microsoft page script replayer)
         run: npm install @microsoft/bc-replay --save
 
-      # Optional: ensure Playwright browsers are present on the runner
-      - name: Install Playwright browsers (first run only)
+      # First-run only: ensure browsers are available on the runner
+      - name: Install Playwright browsers
         run: npx playwright install
 
       - name: Run page script (AAD auth)
@@ -30,11 +41,19 @@ jobs:
           BC_URL: ${{ secrets.BC_URL }}
           BC_USER: ${{ secrets.BC_USER }}
           BC_PASSWORD: ${{ secrets.BC_PASSWORD }}
-        run: |
-          npx --yes --package @microsoft/bc-replay replay ^
-            -Tests ".\tests\pageScripts\post-sales-invoice.yml" ^
-            -StartAddress "%BC_URL%" ^
-            -Authentication AAD ^
-            -UserNameKey BC_USER ^
-            -PasswordKey BC_PASSWORD ^
-            -ResultDir ".\tests\pageScripts\results"
+        run: >
+          npx --yes --package @microsoft/bc-replay replay
+          -Tests ".\tests\pageScripts\post-sales-invoice.yml"
+          -StartAddress "$env:BC_URL"
+          -Authentication AAD
+          -UserNameKey BC_USER
+          -PasswordKey BC_PASSWORD
+          -ResultDir ".\tests\pageScripts\results"
+
+      # Save the HTML report so you can open it from the run artifacts
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/pageScripts/results/playwright-report
