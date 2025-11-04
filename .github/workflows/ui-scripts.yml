@@ -1,0 +1,40 @@
+name: Run page scripts (post AL-Go CI)
+
+on:
+  workflow_run:
+    workflows: ["CI/CD"]            # must match your AL-Go main workflow name
+    types: [completed]
+
+jobs:
+  replay-ui:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install the official replayer from Microsoft (npm)
+      - name: Install bc-replay
+        run: npm install @microsoft/bc-replay --save
+
+      # Optional: ensure Playwright browsers are present on the runner
+      - name: Install Playwright browsers (first run only)
+        run: npx playwright install
+
+      - name: Run page script (AAD auth)
+        env:
+          BC_URL: ${{ secrets.BC_URL }}
+          BC_USER: ${{ secrets.BC_USER }}
+          BC_PASSWORD: ${{ secrets.BC_PASSWORD }}
+        run: |
+          npx --yes --package @microsoft/bc-replay replay ^
+            -Tests ".\tests\pageScripts\post-sales-invoice.yml" ^
+            -StartAddress "%BC_URL%" ^
+            -Authentication AAD ^
+            -UserNameKey BC_USER ^
+            -PasswordKey BC_PASSWORD ^
+            -ResultDir ".\tests\pageScripts\results"
